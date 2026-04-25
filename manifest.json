@@ -1,0 +1,23 @@
+{
+  "name": "HaloCoko Order Manager",
+  "short_name": "HaloCoko",
+  "description": "Aplikasi PWA tidak resmi untuk manajemen pesanan HaloCoko.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FDF7F8",
+  "theme_color": "#3A0110",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
