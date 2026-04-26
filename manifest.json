@@ -1,7 +1,7 @@
 {
   "name": "HaloCoko Order Manager",
   "short_name": "HaloCoko",
-  "description": "Aplikasi PWA tidak resmi untuk manajemen pesanan HaloCoko.",
+  "description": "UnOfficial aplikasi manajemen pesanan HaloCoko.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#FDF7F8",
