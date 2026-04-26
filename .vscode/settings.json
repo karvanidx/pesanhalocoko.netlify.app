@@ -1,7 +1,0 @@
-{
-    "files.exclude": {
-        "**/.git": false,
-        "**/.svn": false,
-        "**/.hg": false
-    }
-}
