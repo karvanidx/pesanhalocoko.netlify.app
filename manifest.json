@@ -2,7 +2,8 @@
   "name": "HaloCoko Order Manager",
   "short_name": "HaloCoko",
   "description": "UnOfficial aplikasi manajemen pesanan HaloCoko.",
-  "start_url": "./index.html",
+  "start_url": "/", 
+  "scope": "/",
   "display": "standalone",
   "background_color": "#FDF7F8",
   "theme_color": "#3A0110",
@@ -11,13 +12,14 @@
     {
       "src": "pesanhalocoko-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "pesanhalocoko-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }
