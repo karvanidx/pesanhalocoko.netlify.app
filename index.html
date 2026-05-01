@@ -1,48 +1,12 @@
 <!DOCTYPE html>
-<html lang="id" class="antialiased text-slate-900 bg-[#E2E8F0]">
+<html lang="id" class="antialiased text-slate-800 bg-[#F1F5F9]">
 <head>
-    <!-- 1. TECHNICAL SEO & META CHARSET -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pesan HaloCoko - UnOfficial Order Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Pesan HaloCoko - Order Manager</title>
     
-    <!-- 2. PRIMARY SEO ON-PAGE -->
-    <meta name="description" content="Aplikasi Order Manager HaloCoko unofficial untuk memudahkan agen/toko dalam merekap pesanan produk es krim secara otomatis dan akurat.">
-    <meta name="keywords" content="HaloCoko, order manager, pesan es krim, aplikasi agen es krim, SuMiCo Milo, JoyCup, es krim box">
-    <meta name="author" content="Ervan Kurniawan">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://pesanhalocoko.netlify.app/">
-    
-    <!-- 3. OPEN GRAPH / SOCIAL MEDIA (Untuk Share ke WhatsApp/Telegram) -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://pesanhalocoko.netlify.app/">
-    <meta property="og:title" content="Pesan HaloCoko - Order Manager">
-    <meta property="og:description" content="Bikin format pesanan es krim HaloCoko hanya dalam hitungan detik. Tanpa ribet, langsung copy-paste!">
-    <meta property="og:image" content="https://pesanhalocoko.netlify.app/og-image.png">
-    <meta property="og:locale" content="id_ID">
-    <meta name="google-site-verification" content="hLwWrk2ikylwVIT2MEUd3O1Mi1aKmWXJqhttlN1L1pM" />
-
-    <!-- 4. PWA / MOBILE THEME SEO -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#F8FAFC">
-    <link rel="apple-touch-icon" href="icon-192.png">
-
-    <!-- 5. SCHEMA.ORG / STRUCTURED DATA (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "HaloCoko Order Manager",
-      "url": "https://pesanhalocoko.netlify.app/",
-      "description": "Aplikasi rekapitulasi dan pemesanan produk es krim HaloCoko khusus agen.",
-      "applicationCategory": "BusinessApplication",
-      "operatingSystem": "All",
-      "author": {
-        "@type": "Person",
-        "name": "Ervan Kurniawan"
-      }
-    }
-    </script>
+    <meta name="description" content="Aplikasi Order Manager HaloCoko unofficial untuk memudahkan agen/toko dalam merekap pesanan produk es krim secara otomatis.">
+    <meta name="theme-color" content="#ffffff">
 
     <!-- Tailwind & Alpine JS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -53,251 +17,326 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        primary: '#2563EB', // Blue 600
+                        primaryHover: '#1D4ED8', // Blue 700
+                    }
                 }
             }
         }
     </script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
         .app-canvas {
             max-width: 480px;
             margin: 0 auto;
             min-height: 100dvh;
-            background-color: #F8FAFC; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background-color: #FAFAFA;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow-x: hidden;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        *:focus-visible { outline: 2px solid #3B82F6; outline-offset: 2px; }
-
-        /* UX FIX: Mengunci scroll di belakang modal (Background Scroll Lock) */
-        body:has(dialog[open]) {
-            overflow: hidden;
-            touch-action: none;
-        }
+        body:has(dialog[open]) { overflow: hidden; touch-action: none; }
 
         /* Modern Dialog Styling */
         dialog {
-            /* Pastikan posisi fixed dan sentral di tengah layar */
-            position: fixed;
-            inset: 0;
-            margin: auto;
-            /* Batasi tinggi modal pada HP agar tidak tumpah dan bisa discroll isinya */
-            max-height: 85dvh; 
-            overflow-y: auto;
-            
-            opacity: 0;
-            transform: translateY(16px) scale(0.98);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            transition-behavior: allow-discrete;
-            border: none;
+            position: fixed; inset: 0; margin: auto;
+            max-height: 90dvh; overflow-y: auto;
+            opacity: 0; transform: translateY(20px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: none; padding: 0; background: transparent;
         }
-        
-        dialog[open] {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            @starting-style { opacity: 0; transform: translateY(16px) scale(0.98); }
-        }
-        
+        dialog[open] { opacity: 1; transform: translateY(0) scale(1); }
         dialog::backdrop {
-            background-color: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(8px);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            transition-behavior: allow-discrete;
+            background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            opacity: 0; transition: opacity 0.3s ease;
         }
-        
-        dialog[open]::backdrop {
-            opacity: 1;
-            @starting-style { opacity: 0; }
-        }
+        dialog[open]::backdrop { opacity: 1; }
 
-        .item-row.is-active { background-color: #F0F9FF; }
-        .item-row { transition: background-color 0.2s ease; }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            background: transparent; bottom: 0; color: transparent; cursor: pointer; height: auto; left: 0; position: absolute; right: 0; top: 0; width: auto;
+        }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800">
 
-    <div x-data="app()" x-init="init()" class="app-canvas pb-40 relative">
+    <div x-data="app()" x-init="init()" class="app-canvas relative">
         
-        <!-- Header Semantic -->
-        <header class="pt-6 pb-4 px-6 bg-[#F8FAFC]/90 sticky top-0 z-20 flex justify-between items-center backdrop-blur-md">
+        <!-- Header -->
+        <header class="pt-6 pb-4 px-5 bg-white/85 sticky top-0 z-30 flex justify-between items-center backdrop-blur-xl border-b border-slate-100">
             <div>
-                <!-- Menggunakan Heading hirarki yang baik untuk SEO -->
-                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">HaloCoko.</h1>
-                <h2 class="text-sm font-medium text-slate-500">Order Manager</h2>
+                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 leading-none">HaloCoko</h1>
+                <p class="text-[11px] font-bold tracking-wide text-primary mt-1 uppercase">Order Manager</p>
             </div>
-            
-            <button @click="$refs.infoModal.showModal()" aria-label="Lihat Informasi Author" class="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm border border-slate-200 text-slate-600 hover:text-slate-900 active:scale-90 transition-transform">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <button @click="$refs.infoModal.showModal()" aria-label="Info Aplikasi" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-100 hover:shadow-sm active:scale-90 transition-all duration-300 group">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-12 transition-transform duration-300"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
             </button>
         </header>
 
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto no-scrollbar px-5 py-2 space-y-8">
+        <!-- Main Content Area (Ditambahkan pb-40 agar scroll produk paling bawah tidak ketutupan bar) -->
+        <main class="flex-1 overflow-y-auto no-scrollbar px-5 py-6 space-y-8 pb-40">
             
-            <!-- Store Form -->
-            <section aria-labelledby="form-section-title" class="space-y-4">
-                <h2 id="form-section-title" class="sr-only">Form Identitas Toko</h2>
-                <div class="relative">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Toko & Alamat</label>
-                    <div class="bg-white rounded-3xl p-1 shadow-sm border border-slate-200 overflow-hidden">
-                        <input type="text" x-model="store.name" @input="save()" aria-label="Masukkan Nama Toko" placeholder="Nama Toko" class="w-full bg-transparent px-4 pt-3 pb-2 text-slate-900 font-semibold focus:outline-none placeholder:text-slate-300 border-b border-slate-100">
-                        <textarea x-model="store.address" @input="save()" aria-label="Masukkan Alamat Lengkap" rows="2" placeholder="Detail Alamat Pengiriman" class="w-full bg-transparent px-4 pt-2 pb-3 text-slate-600 text-sm focus:outline-none placeholder:text-slate-300 resize-none"></textarea>
-                    </div>
-                </div>
-
-                <div class="relative">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Tanggal Pesanan</label>
-                    <input type="date" x-model="store.date" @input="save()" aria-label="Pilih Tanggal Pesanan" class="w-full bg-white border border-slate-200 rounded-2xl px-5 py-3 text-slate-900 font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm transition-all appearance-none">
-                </div>
-            </section>
-
-            <hr class="border-slate-200">
-
-            <!-- Products Catalog -->
-            <section aria-labelledby="katalog-produk-title">
-                <div class="flex justify-between items-end mb-4 px-1">
-                    <h2 id="katalog-produk-title" class="text-xl font-extrabold text-slate-900">Katalog Produk</h2>
-                    <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md" aria-live="polite" x-show="totalDus > 0" x-text="`${totalDus} Dus`"></span>
-                </div>
-
-                <!-- Product Loop -->
-                <template x-for="group in productGroups" :key="group.price">
-                    <div class="mb-6">
-                        <!-- Semantic header untuh kelompok harga -->
-                        <h3 class="text-xs font-bold tracking-widest uppercase text-slate-400 mb-3 ml-2">Harga Rp <span x-text="group.price"></span></h3>
+            <!-- ========== TAB 1: PESAN ========== -->
+            <div x-show="currentTab === 'order'" x-transition.opacity.duration.300ms class="space-y-8">
+                
+                <!-- Form Identitas Toko -->
+                <section class="bg-white rounded-3xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-100">
+                    <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="p-1.5 bg-blue-50 rounded-lg text-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        </span>
+                        Informasi Pengiriman
+                    </h2>
+                    
+                    <div class="space-y-3">
+                        <input type="text" x-model="store.name" @input="save()" x-ref="storeNameInput"
+                               placeholder="Nama Toko / Agen" 
+                               class="w-full bg-slate-50 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-900 border border-slate-200 focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] placeholder:text-slate-400 transition-all duration-300">
                         
-                        <div class="bg-white border border-slate-200 shadow-sm rounded-3xl overflow-hidden">
-                            <template x-for="(item, index) in group.items" :key="item.id">
-                                <div>
-                                    <div class="item-row flex items-center justify-between p-4" :class="{'is-active': item.qty > 0}">
-                                        
-                                        <div class="flex-1 pr-4">
-                                            <span class="font-semibold text-[15px]" :class="item.qty > 0 ? 'text-blue-900' : 'text-slate-800'" x-text="item.name"></span>
-                                        </div>
+                        <textarea x-model="store.address" @input="save()" x-ref="storeAddressInput"
+                                  rows="2" placeholder="Detail Alamat Lengkap" 
+                                  class="w-full bg-slate-50 px-4 py-3.5 rounded-xl text-sm text-slate-900 border border-slate-200 focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] placeholder:text-slate-400 resize-none transition-all duration-300"></textarea>
+                        
+                        <div class="relative">
+                            <input type="date" x-model="store.date" @input="save()" 
+                                   class="w-full bg-slate-50 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-900 border border-slate-200 focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] transition-all duration-300 cursor-pointer">
+                        </div>
+                    </div>
+                </section>
 
-                                        <!-- Stepper -->
-                                        <div class="flex items-center gap-3">
-                                            <button @click="adjust(item.id, -1)" 
-                                                    :aria-label="`Kurangi 1 dus ${item.name}`"
-                                                    class="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 active:scale-90"
-                                                    :class="item.qty > 0 ? 'bg-white text-slate-600 border border-slate-300 shadow-sm hover:border-slate-400' : 'opacity-30 bg-slate-100 text-slate-400 cursor-default'"
-                                                    :disabled="item.qty === 0">
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>
-                                            </button>
-                                            
-                                            <span class="w-4 text-center font-bold font-mono text-[16px] select-none" 
-                                                  :aria-label="`${item.qty} dus dipesan`"
-                                                  :class="item.qty > 0 ? 'text-slate-900' : 'text-slate-300'" 
-                                                  x-text="item.qty"></span>
-                                            
-                                            <button @click="adjust(item.id, 1)" 
-                                                    :aria-label="`Tambah 1 dus ${item.name}`"
-                                                    class="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 active:scale-90"
-                                                    :class="item.qty > 0 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'bg-slate-800 text-white shadow-sm hover:bg-slate-700'">
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                                            </button>
+                <!-- Products Catalog -->
+                <section>
+                    <div class="flex justify-between items-center mb-5 sticky top-[72px] bg-[#FAFAFA]/90 backdrop-blur-md py-2 z-10 border-b border-slate-100/50">
+                        <h2 class="text-lg font-extrabold text-slate-900">Katalog Produk</h2>
+                        <button @click="clear()" x-show="totalDus > 0" class="text-xs font-semibold text-red-500 bg-red-50 px-3 py-1.5 rounded-full hover:bg-red-100 active:scale-95 transition-all">
+                            Reset Pilihan
+                        </button>
+                    </div>
+
+                    <div class="space-y-6">
+                        <template x-for="group in productGroups" :key="group.price">
+                            <div>
+                                <!-- Group Header Fix (Ubah ke / Pcs dan format Rupiah) -->
+                                <div class="flex items-center gap-3 mb-3 pl-1">
+                                    <span class="text-[11px] font-bold tracking-widest uppercase text-slate-500 bg-white shadow-sm px-3 py-1 rounded-full border border-slate-200">
+                                        <span x-text="formatRupiah(group.price)"></span> / Pcs
+                                    </span>
+                                    <div class="h-px bg-slate-200 flex-1"></div>
+                                </div>
+                                
+                                <div class="bg-white border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] rounded-3xl overflow-hidden">
+                                    <template x-for="(item, index) in group.items" :key="item.id">
+                                        <div>
+                                            <!-- Product Row -->
+                                            <div class="flex items-center justify-between p-4 transition-all duration-300"
+                                                 :class="{'bg-blue-50/50': item.qty > 0, 'opacity-50 grayscale bg-slate-50': item.discontinued}">
+                                                
+                                                <div class="flex-1 pr-3">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <h3 class="font-bold text-[15px] transition-colors" :class="item.qty > 0 ? 'text-primary' : 'text-slate-800'" x-text="item.name"></h3>
+                                                        <span x-show="item.discontinued" class="text-[9px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">Stop Produksi</span>
+                                                    </div>
+                                                    <p class="text-xs text-slate-500">
+                                                        Isi <span x-text="item.pcs"></span> pcs/dus
+                                                    </p>
+                                                    
+                                                    <!-- Subtotal Indicator -->
+                                                    <div x-show="item.qty > 0 && !item.discontinued" x-transition.opacity class="text-[13px] font-bold text-emerald-600 mt-1.5">
+                                                        = <span x-text="formatRupiah(item.qty * item.pricePerDus)"></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Stepper Component (Diperbesar Touch Target-nya) -->
+                                                <div x-show="!item.discontinued" class="flex items-center bg-slate-50/80 rounded-full border border-slate-200 p-1">
+                                                    <button @click="adjust(item.id, -1)" 
+                                                            class="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 active:scale-90"
+                                                            :class="item.qty > 0 ? 'text-slate-700 bg-white shadow hover:bg-slate-50' : 'text-slate-300 pointer-events-none'">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/></svg>
+                                                    </button>
+                                                    
+                                                    <span class="w-8 text-center font-bold text-sm" 
+                                                          :class="item.qty > 0 ? 'text-slate-900' : 'text-slate-400'" 
+                                                          x-text="item.qty"></span>
+                                                    
+                                                    <button @click="adjust(item.id, 1)" 
+                                                            class="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 active:scale-90 shadow-sm"
+                                                            :class="item.qty > 0 ? 'bg-primary text-white hover:bg-primaryHover' : 'bg-white text-slate-700 hover:bg-slate-100'">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div x-show="index !== group.items.length - 1" class="h-px bg-slate-100 ml-4"></div>
                                         </div>
-                                    </div>
-                                    <div x-show="index !== group.items.length - 1" class="h-px bg-slate-100 ml-4"></div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ========== TAB 2: RIWAYAT ========== -->
+            <div x-show="currentTab === 'history'" x-transition.opacity.duration.300ms class="space-y-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-lg font-extrabold text-slate-900">Riwayat Pesanan</h2>
+                    <button @click="clearHistory()" x-show="history.length > 0" class="text-xs font-semibold text-slate-500 hover:text-red-600 transition-colors">
+                        Hapus Semua
+                    </button>
+                </div>
+
+                <!-- Empty State -->
+                <div x-show="history.length === 0" class="text-center py-24 px-4 bg-white rounded-3xl border border-slate-200 border-dashed">
+                    <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-slate-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </div>
+                    <p class="text-sm font-bold text-slate-700">Belum Ada Riwayat</p>
+                    <p class="text-xs text-slate-500 mt-1">Pesanan yang telah dibuat akan tersimpan otomatis di sini.</p>
+                </div>
+
+                <!-- History List -->
+                <template x-for="(entry, idx) in history" :key="entry.id">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+                        
+                        <div class="flex justify-between items-start mb-3 pl-1">
+                            <div>
+                                <p class="font-bold text-sm text-slate-900" x-text="entry.storeName || 'Tanpa Nama Toko'"></p>
+                                <p class="text-[11px] text-slate-500" x-text="entry.dateFmt"></p>
+                            </div>
+                            <button @click="deleteHistoryEntry(entry.id)" class="text-slate-300 hover:text-red-500 bg-slate-50 hover:bg-red-50 p-1.5 rounded-lg transition-colors active:scale-90">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-sm mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100 ml-1">
+                            <span class="text-slate-600 text-xs font-semibold" x-text="`${entry.totalDus} Dus (${entry.totalPcs} pcs)`"></span>
+                            <span class="font-extrabold text-slate-900" x-text="formatRupiah(entry.totalPrice)"></span>
+                        </div>
+                        
+                        <div class="flex gap-2 ml-1">
+                            <button @click="showHistoryDetail = entry.id" x-show="showHistoryDetail !== entry.id" class="flex-1 py-2.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-95 transition-all">Lihat Rincian</button>
+                            <button @click="copyText(entry.text)" class="flex-1 py-2.5 text-xs font-bold text-white bg-slate-800 rounded-xl hover:bg-slate-900 flex items-center justify-center gap-1.5 active:scale-95 transition-all">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Salin Ulang
+                            </button>
+                        </div>
+
+                        <!-- Details Expanded -->
+                        <div x-show="showHistoryDetail === entry.id" x-transition class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600 space-y-1.5 ml-1">
+                            <template x-for="item in entry.items" :key="item.id">
+                                <div class="flex justify-between items-center bg-slate-50/50 p-1.5 rounded">
+                                    <span x-text="item.name"></span>
+                                    <span class="font-bold text-slate-800" x-text="`${item.qty} Dus`"></span>
                                 </div>
                             </template>
+                            <button @click="showHistoryDetail = null" class="w-full mt-3 py-2 text-[11px] text-slate-500 font-semibold bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">Tutup Rincian</button>
                         </div>
                     </div>
                 </template>
-            </section>
-
-            <!-- Reset Action -->
-            <div class="pt-2 flex justify-center">
-                <button @click="clear()" x-show="totalDus > 0" class="flex items-center gap-2 text-[13px] font-bold text-slate-400 hover:text-red-500 transition-colors bg-white px-5 py-2.5 rounded-full shadow-sm border border-slate-200 active:scale-95">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                    Hapus Seluruh Pesanan
-                </button>
             </div>
-            
         </main>
 
-        <!-- Floating Button Bottom -->
-        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[480px] px-6 z-40 pointer-events-none">
-            <button @click="generate()" 
-                    aria-live="polite"
-                    :disabled="totalDus < 6"
-                    class="pointer-events-auto w-full h-14 rounded-full font-bold text-[15px] flex items-center justify-center gap-2 transition-all duration-300"
-                    :class="totalDus >= 6 
-                        ? 'bg-slate-900 text-white shadow-[0_12px_24px_rgba(15,23,42,0.4)] active:scale-[0.97]' 
-                        : 'bg-white text-slate-400 border border-slate-200 shadow-2xl cursor-not-allowed'">
-                <template x-if="totalDus >= 6">
-                    <div class="flex items-center gap-2">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                        Buat Pesanan (<span x-text="`${totalDus} Dus`"></span>)
+        <!-- FLOATING BOTTOM NAVIGATION & CHECKOUT BAR -->
+        <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 bg-white border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom,0px)]">
+            
+            <!-- Sticky Checkout Bar (Hanya tampil jika pesanan > 0 di Tab Order) -->
+            <div x-show="currentTab === 'order' && totalDus > 0" 
+                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-y-full opacity-0" x-transition:enter-end="translate-y-0 opacity-100" 
+                 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-y-0 opacity-100" x-transition:leave-end="translate-y-full opacity-0"
+                 class="px-4 pt-4 pb-2">
+                
+                <div class="rounded-2xl p-1.5 flex items-center justify-between transition-all duration-300"
+                     :class="totalDus >= 6 ? 'bg-slate-900 shadow-xl shadow-slate-900/20' : 'bg-slate-100 border border-slate-200'">
+                    
+                    <!-- Left: Harga -->
+                    <div class="pl-3 py-1 flex-1">
+                        <p class="text-[10px] font-semibold tracking-wide" :class="totalDus >= 6 ? 'text-slate-400' : 'text-slate-500'">Estimasi (<span x-text="totalDus"></span> Dus)</p>
+                        <p class="font-extrabold text-[15px] leading-tight mt-0.5" :class="totalDus >= 6 ? 'text-white' : 'text-slate-500'" x-text="formatRupiah(totalPrice)"></p>
                     </div>
-                </template>
-                <template x-if="totalDus < 6">
-                    <div class="flex items-center gap-2">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-                        <span x-text="totalDus === 0 ? 'Pilih min. 6 Dus' : `Kurang ${6 - totalDus} Dus lagi`"></span>
-                    </div>
-                </template>
-            </button>
+
+                    <!-- Right: Tombol -->
+                    <button @click="generate()" :disabled="totalDus < 6"
+                            class="h-11 px-5 rounded-xl font-bold text-[13px] flex items-center gap-1.5 transition-all duration-300 active:scale-[0.97]"
+                            :class="totalDus >= 6 ? 'bg-primary text-white hover:bg-primaryHover hover:shadow-lg' : 'bg-slate-200 text-slate-400 cursor-not-allowed'">
+                        <span x-text="totalDus < 6 ? `Kurang ${6 - totalDus} Dus` : 'Buat Pesanan'"></span>
+                        <svg x-show="totalDus >= 6" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Tabs -->
+            <nav class="flex items-center justify-around h-14 px-2 bg-white">
+                <button @click="currentTab = 'order'" class="flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-all active:scale-95" :class="currentTab === 'order' ? 'text-primary' : 'text-slate-400 hover:bg-slate-50'">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span class="text-[10px] font-bold">Pesan</span>
+                </button>
+                <button @click="currentTab = 'history'" class="flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-all active:scale-95" :class="currentTab === 'history' ? 'text-primary' : 'text-slate-400 hover:bg-slate-50'">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span class="text-[10px] font-bold">Riwayat</span>
+                </button>
+            </nav>
         </div>
 
-        <!-- Result Modal (Fixed di Center, Anti-Scroll Body) -->
-        <dialog id="result-modal" x-ref="modal" @click="if($event.target === $el) $el.close()" class="w-[90%] max-w-sm rounded-3xl shadow-2xl p-0 bg-white m-auto">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-3xl sticky top-0 z-10">
-                <h2 class="font-extrabold text-slate-900 text-lg">Format Teks</h2>
-                <button aria-label="Tutup Format" @click="$refs.modal.close()" class="text-slate-400 bg-white hover:text-slate-800 hover:bg-slate-100 p-2 rounded-full active:scale-90 transition-all border border-slate-200 shadow-sm">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        <!-- Toast Notification (Modern Snackbar) -->
+        <div x-show="toast.show" x-transition.opacity.duration.300ms x-transition:enter-start="-translate-y-4" x-transition:enter-end="translate-y-0"
+             class="fixed top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 bg-slate-800 text-white px-5 py-3 rounded-full shadow-2xl text-sm font-semibold whitespace-nowrap border border-slate-700">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span x-text="toast.message"></span>
+        </div>
+
+        <!-- Modal Hasil Format -->
+        <dialog id="result-modal" x-ref="modal" class="w-[90%] max-w-sm rounded-3xl shadow-2xl bg-white m-auto overflow-hidden">
+            <div class="p-5 flex justify-between items-center bg-slate-50 border-b border-slate-100">
+                <h2 class="font-extrabold text-slate-900 text-base">Format Disalin</h2>
+                <button @click="$refs.modal.close()" class="text-slate-400 hover:text-slate-800 hover:bg-slate-200 bg-white p-2 rounded-full active:scale-90 transition-all border border-slate-200 shadow-sm">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
             
             <div class="p-5">
-                <!-- Textarea buat naruh format copy (dibikin gampang select & A11y support) -->
-                <textarea readonly aria-label="Teks rekap pesanan, klik untuk manual select" x-model="result" class="w-full h-64 bg-slate-50 border border-slate-200 rounded-xl p-4 text-[13px] font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none leading-relaxed"></textarea>
+                <p class="text-xs text-slate-500 mb-3 font-medium">Teks ini sudah otomatis tersalin. Silakan <strong class="text-slate-800">Paste</strong> di WhatsApp Anda.</p>
+                <!-- Area Struk Terminal -->
+                <div class="w-full h-64 bg-slate-800 rounded-2xl p-4 overflow-y-auto shadow-inner border border-slate-900">
+                    <pre class="text-[12px] font-mono text-slate-300 whitespace-pre-wrap leading-relaxed" x-text="result"></pre>
+                </div>
             </div>
 
             <div class="px-5 pb-5 pt-0">
-                <button aria-live="assertive" @click="copy()" class="w-full h-12 rounded-xl font-bold text-white transition-all active:scale-95 flex justify-center items-center gap-2 shadow-md"
-                        :class="copied ? 'bg-emerald-600' : 'bg-blue-600'">
-                    <template x-if="!copied">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                    </template>
-                    <template x-if="copied">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    </template>
-                    <span x-text="copied ? 'Berhasil disalin!' : 'Salin Text'"></span>
+                <button @click="copyText(result)" class="w-full h-12 rounded-xl font-bold text-white transition-all active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-blue-500/30 bg-primary hover:bg-primaryHover group">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="group-hover:scale-110 transition-transform"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    Salin Ulang Teks
                 </button>
             </div>
         </dialog>
 
-        <!-- Credit/Info Modal (Fixed di Center) -->
+        <!-- Credit/Info Modal -->
         <dialog id="info-modal" x-ref="infoModal" @click="if($event.target === $el) $el.close()" class="w-[85%] max-w-sm rounded-3xl shadow-2xl p-0 bg-white m-auto overflow-hidden relative">
-            
-            <button aria-label="Tutup Informasi" @click="$refs.infoModal.close()" class="absolute top-4 right-4 z-10 text-slate-400 bg-white/50 backdrop-blur-md hover:text-slate-800 hover:bg-white p-2 rounded-full active:scale-90 transition-all shadow-sm">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <button @click="$refs.infoModal.close()" class="absolute top-4 right-4 z-10 text-slate-400 bg-white/50 backdrop-blur-md hover:text-slate-800 hover:bg-white p-2 rounded-full active:scale-90 transition-all shadow-sm">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
 
-            <div class="p-8 pb-6 text-center bg-slate-50 flex flex-col items-center">
-                <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-white mb-4 rotate-3 shadow-lg">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+            <div class="pt-10 pb-6 px-6 text-center bg-slate-50 flex flex-col items-center border-b border-slate-100">
+                <div class="w-16 h-16 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-slate-900/20 rotate-3 hover:rotate-0 transition-transform duration-300">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
                 </div>
                 <h2 class="font-extrabold text-slate-900 text-xl tracking-tight">Ervan Kurniawan</h2>
-                <p class="text-[13px] font-semibold text-slate-500 mt-1">Software Engineer</p>
+                <p class="text-xs font-bold text-primary mt-1">Software Engineer</p>
+                <p class="text-xs text-slate-500 mt-4 leading-relaxed font-medium">Aplikasi unofficial untuk mempermudah rekapitulasi pesanan secara cepat dan efisien.</p>
             </div>
             
-            <div class="p-6 bg-white space-y-3 border-t border-slate-100">
-                <a href="https://t.me/karvanidx" target="_blank" rel="noopener" class="w-full h-12 flex items-center justify-center gap-2 bg-[#F0F9FF] text-[#0284C7] rounded-xl font-bold text-sm active:scale-95 transition-transform border border-[#E0F2FE]">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                    Chat via Telegram
+            <div class="p-6 bg-white space-y-3">
+                <a href="https://t.me/karvanidx" target="_blank" rel="noopener" class="group w-full py-3.5 flex items-center justify-center gap-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:-translate-y-1 hover:shadow-md hover:bg-blue-100 active:scale-95 transition-all duration-300 border border-blue-100">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Chat via Telegram
                 </a>
-                <a href="https://trakteer.id/ervankurniawan41" target="_blank" rel="noopener" class="w-full h-12 flex items-center justify-center gap-2 bg-[#FEF2F2] text-[#DC2626] rounded-xl font-bold text-sm active:scale-95 transition-transform border border-[#FEE2E2]">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-                    Dukung di Trakteer
+                <a href="https://trakteer.id/ervankurniawan41" target="_blank" rel="noopener" class="group w-full py-3.5 flex items-center justify-center gap-2 bg-red-50 text-red-600 rounded-xl font-bold text-sm hover:-translate-y-1 hover:shadow-md hover:bg-red-100 active:scale-95 transition-all duration-300 border border-red-100">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="group-hover:scale-110 transition-transform duration-300"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Dukung di Trakteer
                 </a>
             </div>
         </dialog>
@@ -306,40 +345,44 @@
 
     <!-- Application JS Logic -->
     <script>
+        const PRICE_MAP = {
+            1: { pcs: 60, price: 93000 }, 2: { pcs: 60, price: 93000 }, 3: { pcs: 60, price: 93000 },
+            4: { pcs: 50, price: 77500 }, 5: { pcs: 50, price: 77500 }, 6: { pcs: 50, price: 77500 }, 
+            7: { pcs: 50, price: 77500, discontinued: true }, 8: { pcs: 50, price: 77500, discontinued: true }, 9: { pcs: 50, price: 77500, discontinued: true },
+            10: { pcs: 50, price: 77500 }, 11: { pcs: 50, price: 77500 },
+            12: { pcs: 25, price: 95000 }, 13: { pcs: 40, price: 158000 }, 14: { pcs: 40, price: 158000 },
+            15: { pcs: 36, price: 83500 }, 16: { pcs: 40, price: 93000 }, 17: { pcs: 40, price: 93000 },
+            18: { pcs: 40, price: 93000 }, 19: { pcs: 40, price: 95000 }, 20: { pcs: 42, price: 143000 },
+            21: { pcs: 40, price: 125000 }, 22: { pcs: 40, price: 125000 }, 23: { pcs: 40, price: 125000 }
+        };
+
         const initialDB = [
-            { id: 1, name: 'SuMiCo Milo', price: 2000, qty: 0 },
-            { id: 2, name: 'SuTaCo Taro', price: 2000, qty: 0 },
-            { id: 3, name: 'SuKoCo Kopi', price: 2000, qty: 0 },
-            { id: 4, name: 'Yogurt Krispi', price: 2000, qty: 0 },
-            { id: 5, name: 'KastilEs Cokelat', price: 2000, qty: 0 },
-            { id: 6, name: 'KastilEs Yogurt', price: 2000, qty: 0 },
-            { id: 7, name: 'KastilEs Teh', price: 2000, qty: 0 },
-            { id: 8, name: 'KastilEs Gula Kelapa', price: 2000, qty: 0 },
-            { id: 9, name: 'KastilEs Kopi', price: 2000, qty: 0 },
-            { id: 10, name: 'KastilEs Semangka Nanas', price: 2000, qty: 0 },
-            { id: 11, name: 'KastilEs Melon Anggur', price: 2000, qty: 0 },
-            { id: 12, name: 'JoyCup Cokelat', price: 5000, qty: 0 },
-            { id: 13, name: 'HaloCookies', price: 5000, qty: 0 },
-            { id: 14, name: 'HaloChoco', price: 5000, qty: 0 },
-            { id: 15, name: '143 Cup', price: 3000, qty: 0 },
-            { id: 16, name: 'KaKaKres Cokelat', price: 3000, qty: 0 },
-            { id: 17, name: 'PisCok Krispi', price: 3000, qty: 0 },
-            { id: 18, name: 'Tiger Choco', price: 3000, qty: 0 },
-            { id: 19, name: 'Red Zebra Choco', price: 3000, qty: 0 },
-            { id: 20, name: '23º Choco Cone', price: 4000, qty: 0 },
-            { id: 21, name: 'Fantasy Almond', price: 4000, qty: 0 },
-            { id: 22, name: 'Fantasy Caramel Malt', price: 4000, qty: 0 },
+            { id: 1, name: 'SuMiCo Milo', price: 2000, qty: 0 }, { id: 2, name: 'SuTaCo Taro', price: 2000, qty: 0 },
+            { id: 3, name: 'SuKoCo Kopi', price: 2000, qty: 0 }, { id: 4, name: 'Yogurt Krispi', price: 2000, qty: 0 },
+            { id: 5, name: 'KastilEs Cokelat', price: 2000, qty: 0 }, { id: 6, name: 'KastilEs Yogurt', price: 2000, qty: 0 },
+            { id: 7, name: 'KastilEs Teh', price: 2000, qty: 0 }, { id: 8, name: 'KastilEs Gula Kelapa', price: 2000, qty: 0 },
+            { id: 9, name: 'KastilEs Kopi', price: 2000, qty: 0 }, { id: 10, name: 'KastilEs Semangka Nanas', price: 2000, qty: 0 },
+            { id: 11, name: 'KastilEs Melon Anggur', price: 2000, qty: 0 }, { id: 12, name: 'JoyCup Cokelat', price: 5000, qty: 0 },
+            { id: 13, name: 'HaloCookies', price: 5000, qty: 0 }, { id: 14, name: 'HaloChoco', price: 5000, qty: 0 },
+            { id: 15, name: '143 Cup', price: 3000, qty: 0 }, { id: 16, name: 'KaKaKres Cokelat', price: 3000, qty: 0 },
+            { id: 17, name: 'PisCok Krispi', price: 3000, qty: 0 }, { id: 18, name: 'Tiger Choco', price: 3000, qty: 0 },
+            { id: 19, name: 'Red Zebra Choco', price: 3000, qty: 0 }, { id: 20, name: '23º Choco Cone', price: 4000, qty: 0 },
+            { id: 21, name: 'Fantasy Almond', price: 4000, qty: 0 }, { id: 22, name: 'Fantasy Caramel Malt', price: 4000, qty: 0 },
             { id: 23, name: 'Tiramisu Cookies', price: 4000, qty: 0 },
         ];
 
         document.addEventListener('alpine:init', () => {
             Alpine.data('app', () => ({
-                store: {
-                    name: '', address: '', date: new Date().toISOString().split('T')[0]
-                },
-                items: JSON.parse(JSON.stringify(initialDB)),
+                currentTab: 'order',
+                store: { name: '', address: '', date: new Date().toISOString().split('T')[0] },
+                items: JSON.parse(JSON.stringify(initialDB)).map(item => {
+                    const info = PRICE_MAP[item.id] || { pcs: 0, price: 0 };
+                    return { ...item, pcs: info.pcs, pricePerDus: info.price, discontinued: info.discontinued || false, qty: 0 };
+                }),
                 result: '',
-                copied: false,
+                history: [],
+                showHistoryDetail: null,
+                toast: { show: false, message: '', timeout: null },
 
                 init() {
                     const cache = localStorage.getItem('hc_app_v5_final');
@@ -353,91 +396,132 @@
                             });
                         } catch(e) {}
                     }
+                    
+                    const histCache = localStorage.getItem('hc_history');
+                    if (histCache) {
+                        try { this.history = JSON.parse(histCache); } catch(e) {}
+                    }
+                    this.$watch('currentTab', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+                },
+
+                showToast(msg) {
+                    this.toast.message = msg;
+                    this.toast.show = true;
+                    if(this.toast.timeout) clearTimeout(this.toast.timeout);
+                    this.toast.timeout = setTimeout(() => this.toast.show = false, 2500);
+                },
+
+                formatRupiah(num) {
+                    return 'Rp ' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
                 },
 
                 save() {
                     localStorage.setItem('hc_app_v5_final', JSON.stringify({
-                        store: { name: this.store.name, address: this.store.address },
-                        items: this.items
+                        store: { name: this.store.name, address: this.store.address, date: this.store.date }, items: this.items
                     }));
                 },
 
+                saveHistory() { localStorage.setItem('hc_history', JSON.stringify(this.history)); },
+
                 clear() {
-                    if(confirm('Reset daftar keranjang belanja? (Nama dan Alamat toko tidak terhapus)')) {
-                        this.items = JSON.parse(JSON.stringify(initialDB));
+                    if(confirm('Hapus daftar produk di keranjang? (Nama dan Alamat toko aman)')) {
+                        this.items.forEach(i => i.qty = 0);
                         this.save();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 },
 
                 adjust(id, val) {
+                    const item = this.items.find(p => p.id === id);
+                    if (!item || item.discontinued) return;
                     if (navigator.vibrate) navigator.vibrate(10);
-                    const idx = this.items.findIndex(p => p.id === id);
-                    if (idx !== -1) {
-                        let res = this.items[idx].qty + val;
-                        this.items[idx].qty = res < 0 ? 0 : res;
-                        this.save();
-                    }
+                    item.qty = Math.max(0, item.qty + val);
+                    this.save();
                 },
 
-                get totalDus() {
-                    return this.items.reduce((acc, el) => acc + el.qty, 0);
-                },
+                get totalDus() { return this.items.reduce((a, b) => a + b.qty, 0); },
+                get totalPcs() { return this.items.reduce((a, b) => a + (b.qty * b.pcs), 0); },
+                get totalPrice() { return this.items.reduce((a, b) => a + (b.qty * b.pricePerDus), 0); },
 
                 get productGroups() {
                     const map = this.items.reduce((acc, el) => {
                         if (!acc[el.price]) acc[el.price] = [];
-                        acc[el.price].push(el);
-                        return acc;
+                        acc[el.price].push(el); return acc;
                     }, {});
-                    
-                    return Object.keys(map).sort((a,b)=>a-b).map(k => ({
-                        price: k,
-                        items: map[k]
-                    }));
+                    return Object.keys(map).sort((a,b)=>a-b).map(k => ({ price: k, items: map[k] }));
                 },
 
                 generate() {
                     if(this.totalDus < 6) return;
-                    
+
+                    const nameEmpty = !this.store.name.trim();
+                    const addrEmpty = !this.store.address.trim();
+
+                    if (nameEmpty || addrEmpty) {
+                        if (!confirm("Toko atau Alamat masih kosong. Hasil tetap dibuat dengan tanda '-'. Lanjutkan?")) {
+                            this.$nextTick(() => {
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                nameEmpty ? this.$refs.storeNameInput.focus() : this.$refs.storeAddressInput.focus();
+                            });
+                            return;
+                        }
+                    }
+
                     const d = new Date(this.store.date);
                     const dFmt = d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric'});
 
-                    let txt = `HaloCoko Order\n=================\n\n`;
+                    let txt = `*HaloCoko Order*\n=================\n\n`;
                     txt += `Toko   : ${this.store.name || '-'}\n`;
                     txt += `Alamat : ${this.store.address || '-'}\n`;
                     txt += `Waktu  : ${dFmt}\n\n`;
                     txt += `*List Produk:*\n`;
 
-                    let num = 1;
+                    let num = 1; const orderedItems = [];
                     this.items.filter(i => i.qty > 0).forEach(i => {
                         txt += `${num}. ${i.name} = ${i.qty} Dus\n`;
+                        orderedItems.push({ id: i.id, name: i.name, qty: i.qty, pricePerDus: i.pricePerDus, pcs: i.pcs });
                         num++;
                     });
 
                     txt += `\n*TOTAL: ${this.totalDus} Dus*`;
 
                     this.result = txt;
-                    this.copied = false;
+                    
+                    const historyEntry = {
+                        id: Date.now(), storeName: this.store.name, address: this.store.address, date: this.store.date, dateFmt: dFmt, items: orderedItems, totalDus: this.totalDus, totalPcs: this.totalPcs, totalPrice: this.totalPrice, text: txt
+                    };
+                    this.history.unshift(historyEntry);
+                    if (this.history.length > 50) this.history = this.history.slice(0, 50);
+                    this.saveHistory();
+
+                    this.copyText(txt, true);
                     this.$refs.modal.showModal();
                 },
 
-                async copy() {
+                async copyText(text, fromGenerate = false) {
                     try {
-                        await navigator.clipboard.writeText(this.result);
-                        this.copied = true;
+                        await navigator.clipboard.writeText(text);
                         if (navigator.vibrate) navigator.vibrate(20);
-                        setTimeout(() => this.copied = false, 2500);
+                        if (!fromGenerate) this.showToast('Teks berhasil disalin!');
                     } catch(e) {
-                        alert('Gagal menyalin. Silakan seleksi teks pada area abu-abu dan copy manual.');
+                        this.showToast('Gagal menyalin otomatis.');
+                    }
+                },
+
+                deleteHistoryEntry(id) {
+                    if(confirm('Hapus riwayat pesanan ini?')) {
+                        this.history = this.history.filter(e => e.id !== id);
+                        this.saveHistory();
+                    }
+                },
+
+                clearHistory() {
+                    if(confirm('Hapus seluruh riwayat pesanan?')) {
+                        this.history = []; this.saveHistory();
                     }
                 }
             }));
         });
-        
-        // Register PWA Service Worker for Offline Capabilities
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
-        }
     </script>
 </body>
 </html>

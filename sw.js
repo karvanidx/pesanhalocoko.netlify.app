@@ -3,9 +3,8 @@ const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  // Masukkan nama icon kesini jika sudah ada
-  // './icon-192.png',
-  // './icon-512.png' 
+  './pesanhalocoko-192x192.png',
+  './pesanhalocoko-512x512.png' 
 ];
 
 // Install SW
