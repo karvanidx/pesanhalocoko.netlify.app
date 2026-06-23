@@ -435,6 +435,28 @@
             { id: 23, name: 'Tiramisu Cookies', price: 4000, qty: 0 },
         ];
 
+        // ═══ PWA Install Prompt (global, per web.dev & MDN docs) ═══
+        // Listener HARUS di top-level — beforeinstallprompt bisa fire sebelum Alpine mount
+        window.__deferredPrompt = null;
+        window.__showInstallPill = false;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent browser's native mini-infobar so we show our own UI
+            e.preventDefault();
+            window.__deferredPrompt = e;
+            window.__showInstallPill = true;
+            // If Alpine sudah mounted, langsung tampilin pill
+            const appEl = document.querySelector('[x-data]');
+            if (appEl && appEl.__x) {
+                const alpine = appEl.__x.$data;
+                if (alpine) {
+                    alpine.deferredPrompt = e;
+                    alpine.showInstallPill = true;
+                }
+            }
+        });
+
+        // ═══ Alpine Init ═══
         document.addEventListener('alpine:init', () => {
             Alpine.data('app', () => ({
                 currentTab: 'order',
@@ -452,10 +474,17 @@
                 deferredPrompt: null,
 
                 init() {
-                    // PWA install prompt — only if not already in standalone mode
+                    // PWA install prompt — cek global event + listen untuk next fire
                     if (!window.matchMedia('(display-mode: standalone)').matches) {
+                        // Cek apakah event sudah fire sebelum Alpine mount
+                        if (window.__showInstallPill && window.__deferredPrompt) {
+                            this.deferredPrompt = window.__deferredPrompt;
+                            this.showInstallPill = true;
+                        }
+                        // Tetap listen untuk kasus event fire setelah Alpine mount
                         window.addEventListener('beforeinstallprompt', (e) => {
                             e.preventDefault();
+                            window.__deferredPrompt = e;
                             this.deferredPrompt = e;
                             this.showInstallPill = true;
                         });
