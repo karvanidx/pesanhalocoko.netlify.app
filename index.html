@@ -269,12 +269,12 @@
 
         <!-- CHECKOUT BAR: fixed terpisah, z-30 di BELAKANG nav bar (z-40) -->
         <div x-show="currentTab === 'order' && totalDus > 0"
-             x-transition:enter="transition-all duration-[400ms] ease-[cubic-bezier(0,0,0.2,1)]"
-             x-transition:enter-start="translate-y-full opacity-0"
-             x-transition:enter-end="translate-y-0 opacity-100"
-             x-transition:leave="transition-all duration-[250ms] ease-[cubic-bezier(0.4,0,1,1)]"
-             x-transition:leave-start="translate-y-0 opacity-100"
-             x-transition:leave-end="translate-y-full opacity-0"
+             x-transition:enter="transition-transform duration-[400ms] ease-[cubic-bezier(0,0,0.2,1)]"
+             x-transition:enter-start="translate-y-full"
+             x-transition:enter-end="translate-y-0"
+             x-transition:leave="transition-transform duration-[250ms] ease-[cubic-bezier(0.4,0,1,1)]"
+             x-transition:leave-start="translate-y-0"
+             x-transition:leave-end="translate-y-full"
              class="fixed bottom-14 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-30 px-4 pt-3 pb-1 bg-white/95 backdrop-blur-md border-t border-slate-200/80">
 
             <div class="rounded-2xl p-1.5 flex items-center justify-between transition-all duration-300"
@@ -435,13 +435,6 @@
             { id: 23, name: 'Tiramisu Cookies', price: 4000, qty: 0 },
         ];
 
-        // Global beforeinstallprompt — tangkap event meski fire sebelum Alpine mount
-        let _deferredPrompt = null;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            _deferredPrompt = e;
-        });
-
         document.addEventListener('alpine:init', () => {
             Alpine.data('app', () => ({
                 currentTab: 'order',
@@ -459,22 +452,12 @@
                 deferredPrompt: null,
 
                 init() {
-                    // PWA install prompt — only if not already installed
+                    // PWA install prompt — only if not already in standalone mode
                     if (!window.matchMedia('(display-mode: standalone)').matches) {
-                        // Cek apakah event udah fire sebelum Alpine mount
-                        if (_deferredPrompt) {
-                            this.deferredPrompt = _deferredPrompt;
-                            this.showInstallPill = true;
-                        }
-                        // Tetap listen untuk next visit
                         window.addEventListener('beforeinstallprompt', (e) => {
                             e.preventDefault();
                             this.deferredPrompt = e;
                             this.showInstallPill = true;
-                        });
-                        window.addEventListener('appinstalled', () => {
-                            this.showInstallPill = false;
-                            this.deferredPrompt = null;
                         });
                     }
 
