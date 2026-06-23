@@ -267,39 +267,36 @@
             </div>
         </main>
 
-        <!-- FLOATING BOTTOM NAVIGATION & CHECKOUT BAR -->
-        <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 bg-white border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom,0px)]">
-            
-            <!-- Sticky Checkout Bar (Hanya tampil jika pesanan > 0 di Tab Order) -->
-            <div x-show="currentTab === 'order' && totalDus > 0"
-                 x-transition:enter="transition-all duration-[400ms] ease-[cubic-bezier(0,0,0.2,1)]"
-                 x-transition:enter-start="translate-y-full opacity-0"
-                 x-transition:enter-end="translate-y-0 opacity-100"
-                 x-transition:leave="transition-all duration-[250ms] ease-[cubic-bezier(0.4,0,1,1)]"
-                 x-transition:leave-start="translate-y-0 opacity-100"
-                 x-transition:leave-end="translate-y-full opacity-0"
-                 class="px-4 pt-4 pb-2">
-                
-                <div class="rounded-2xl p-1.5 flex items-center justify-between transition-all duration-300"
-                     :class="totalDus >= 6 ? 'bg-slate-900 shadow-xl shadow-slate-900/20' : 'bg-slate-100 border border-slate-200'">
-                    
-                    <!-- Left: Harga -->
-                    <div class="pl-3 py-1 flex-1">
-                        <p class="text-[10px] font-semibold tracking-wide" :class="totalDus >= 6 ? 'text-slate-400' : 'text-slate-500'">Estimasi (<span x-text="totalDus"></span> Dus)</p>
-                        <p class="font-extrabold text-[15px] leading-tight mt-0.5" :class="totalDus >= 6 ? 'text-white' : 'text-slate-500'" x-text="formatRupiah(totalPrice)"></p>
-                    </div>
+        <!-- CHECKOUT BAR: fixed terpisah, z-30 di BELAKANG nav bar (z-40) -->
+        <div x-show="currentTab === 'order' && totalDus > 0"
+             x-transition:enter="transition-all duration-[400ms] ease-[cubic-bezier(0,0,0.2,1)]"
+             x-transition:enter-start="translate-y-full opacity-0"
+             x-transition:enter-end="translate-y-0 opacity-100"
+             x-transition:leave="transition-all duration-[250ms] ease-[cubic-bezier(0.4,0,1,1)]"
+             x-transition:leave-start="translate-y-0 opacity-100"
+             x-transition:leave-end="translate-y-full opacity-0"
+             class="fixed bottom-14 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-30 px-4 pt-3 pb-1 bg-white/95 backdrop-blur-md border-t border-slate-200/80">
 
-                    <!-- Right: Tombol -->
-                    <button @click="generate()" :disabled="totalDus < 6"
-                            class="h-11 px-5 rounded-xl font-bold text-[13px] flex items-center gap-1.5 transition-all duration-300 active:scale-[0.97]"
-                            :class="totalDus >= 6 ? 'bg-primary text-white hover:bg-primaryHover hover:shadow-lg' : 'bg-slate-200 text-slate-400 cursor-not-allowed'">
-                        <span x-text="totalDus < 6 ? `Kurang ${6 - totalDus} Dus` : 'Buat Pesanan'"></span>
-                        <svg x-show="totalDus >= 6" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                    </button>
+            <div class="rounded-2xl p-1.5 flex items-center justify-between transition-all duration-300"
+                 :class="totalDus >= 6 ? 'bg-slate-900 shadow-xl shadow-slate-900/20' : 'bg-slate-100 border border-slate-200'">
+
+                <div class="pl-3 py-1 flex-1">
+                    <p class="text-[10px] font-semibold tracking-wide" :class="totalDus >= 6 ? 'text-slate-400' : 'text-slate-500'">Estimasi (<span x-text="totalDus"></span> Dus)</p>
+                    <p class="font-extrabold text-[15px] leading-tight mt-0.5" :class="totalDus >= 6 ? 'text-white' : 'text-slate-500'" x-text="formatRupiah(totalPrice)"></p>
                 </div>
-            </div>
 
-            <!-- Bottom Tabs -->
+                <button @click="generate()" :disabled="totalDus < 6"
+                        class="h-11 px-5 rounded-xl font-bold text-[13px] flex items-center gap-1.5 transition-all duration-300 active:scale-[0.97]"
+                        :class="totalDus >= 6 ? 'bg-primary text-white hover:bg-primaryHover hover:shadow-lg' : 'bg-slate-200 text-slate-400 cursor-not-allowed'">
+                    <span x-text="totalDus < 6 ? `Kurang ${6 - totalDus} Dus` : 'Buat Pesanan'"></span>
+                    <svg x-show="totalDus >= 6" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV BAR: z-40 di DEPAN checkout -->
+        <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 bg-white border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom,0px)]">
+
             <nav class="flex items-center justify-around h-14 px-2 bg-white">
                 <button @click="currentTab = 'order'" class="flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-all active:scale-95" :class="currentTab === 'order' ? 'text-primary' : 'text-slate-400 hover:bg-slate-50'">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -438,6 +435,13 @@
             { id: 23, name: 'Tiramisu Cookies', price: 4000, qty: 0 },
         ];
 
+        // Global beforeinstallprompt — tangkap event meski fire sebelum Alpine mount
+        let _deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            _deferredPrompt = e;
+        });
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('app', () => ({
                 currentTab: 'order',
@@ -457,12 +461,17 @@
                 init() {
                     // PWA install prompt — only if not already installed
                     if (!window.matchMedia('(display-mode: standalone)').matches) {
+                        // Cek apakah event udah fire sebelum Alpine mount
+                        if (_deferredPrompt) {
+                            this.deferredPrompt = _deferredPrompt;
+                            this.showInstallPill = true;
+                        }
+                        // Tetap listen untuk next visit
                         window.addEventListener('beforeinstallprompt', (e) => {
                             e.preventDefault();
                             this.deferredPrompt = e;
-                            setTimeout(() => { this.showInstallPill = true; }, 2000);
+                            this.showInstallPill = true;
                         });
-                        // Fallback: some browsers fire this on page load if criteria met
                         window.addEventListener('appinstalled', () => {
                             this.showInstallPill = false;
                             this.deferredPrompt = null;
