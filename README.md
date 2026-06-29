@@ -46,7 +46,8 @@ Buka `http://localhost:3000` (atau port yang digunakan).
 ├── manifest.json       # Web App Manifest (PWA)
 ├── pesanhalocoko-*.png # Icon PWA (192px + 512px)
 ├── og-image.png        # Open Graph image
-├── preview_subtotal-layout.html  # UI preview sebelum implementasi
+├── previews/            # UI preview sebelum implementasi
+│   └── subtotal-layout.html
 ├── notes/              # Catatan dan dokumentasi
 │   └── 29-06-2026_pwa-without-framework.md
 └── README.md
