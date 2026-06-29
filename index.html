@@ -137,14 +137,22 @@
                     <div class="space-y-6">
                         <template x-for="group in productGroups" :key="group.price">
                             <div>
-                                <!-- Group Header with Fold Toggle -->
+                                <!-- Group Header with Fold Toggle + Active Indicator -->
                                 <div class="flex items-center gap-3 mb-3 pl-1">
                                     <span class="text-[11px] font-bold tracking-widest uppercase text-slate-500 bg-white shadow-sm px-3 py-1 rounded-full border border-slate-200 shrink-0">
                                         <span x-text="formatRupiah(group.price)"></span> / Pcs
                                     </span>
-                                    <div class="h-px bg-slate-200 flex-1"></div>
+                                    <!-- Horizontal line with optional active indicator -->
+                                    <div class="relative flex-1 flex items-center">
+                                        <div class="h-px bg-slate-200 w-full"></div>
+                                        <span x-show="collapsedGroups[group.price] && groupActiveCount(group) > 0"
+                                              x-transition.opacity.duration.200ms
+                                              class="absolute left-1/2 -translate-x-1/2 bg-[#FAFAFA] px-2.5 text-[10px] font-semibold text-amber-700 whitespace-nowrap">
+                                            <span x-text="groupActiveCount(group)"></span> produk dipesan
+                                        </span>
+                                    </div>
                                     <button @click="toggleGroup(group.price)"
-                                            class="shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-700 hover:border-slate-300 active:scale-90 transition-all duration-200"
+                                            class="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-700 hover:border-slate-300 active:scale-90 transition-all duration-200"
                                             :aria-label="collapsedGroups[group.price] ? 'Expand' : 'Collapse'">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
                                              class="transition-transform duration-300"
@@ -506,7 +514,7 @@
                     if (histCache) {
                         try { this.history = JSON.parse(histCache); } catch(e) {}
                     }
-                    this.$watch('currentTab', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+                    this.$watch('currentTab', () => window.scrollTo({ top: 0, behavior: 'instant' }));
                 },
 
                 showToast(msg) {
@@ -518,6 +526,11 @@
 
                 formatRupiah(num) {
                     return 'Rp ' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                },
+
+                formatDate(dateStr) {
+                    const [y, m, d] = dateStr.split('-');
+                    return `${d}-${m}-${y}`;
                 },
 
                 save() {
@@ -576,6 +589,10 @@
                     return Object.keys(map).sort((a,b)=>a-b).map(k => ({ price: k, items: map[k] }));
                 },
 
+                groupActiveCount(group) {
+                    return group.items.filter(i => i.qty > 0).length;
+                },
+
                 generate() {
                     if(this.totalDus < 6) return;
 
@@ -592,8 +609,7 @@
                         }
                     }
 
-                    const d = new Date(this.store.date);
-                    const dFmt = d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric'});
+                    const dFmt = this.formatDate(this.store.date);
 
                     let txt = `*HaloCoko Order*\n=================\n\n`;
                     txt += `Toko   : ${this.store.name || '-'}\n`;
