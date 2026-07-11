@@ -111,12 +111,14 @@
                     
                     <div class="space-y-3">
                         <input type="text" x-model="store.name" @input="save()" x-ref="storeNameInput"
-                               placeholder="Nama Toko / Agen" 
-                               class="w-full bg-slate-50 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-900 border border-slate-200 focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] placeholder:text-slate-400 transition-all duration-300">
-                        
+                               placeholder="Nama Toko / Agen"
+                               :class="totalDus > 0 && !store.name.trim() ? 'border-red-300 bg-red-50/30 focus:border-red-400 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.1)]' : 'border-slate-200 focus:border-primary focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)]'"
+                               class="w-full bg-slate-50 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-900 border focus:outline-none focus:bg-white placeholder:text-slate-400 transition-all duration-300">
+
                         <textarea x-model="store.address" @input="save()" x-ref="storeAddressInput"
-                                  rows="2" placeholder="Detail Alamat Lengkap" 
-                                  class="w-full bg-slate-50 px-4 py-3.5 rounded-xl text-sm text-slate-900 border border-slate-200 focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] placeholder:text-slate-400 resize-none transition-all duration-300"></textarea>
+                                  rows="2" placeholder="Detail Alamat Lengkap"
+                                  :class="totalDus > 0 && !store.address.trim() ? 'border-red-300 bg-red-50/30 focus:border-red-400 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.1)]' : 'border-slate-200 focus:border-primary focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)]'"
+                                  class="w-full bg-slate-50 px-4 py-3.5 rounded-xl text-sm text-slate-900 border focus:outline-none focus:bg-white placeholder:text-slate-400 resize-none transition-all duration-300"></textarea>
                         
                         <div class="relative">
                             <input type="date" x-model="store.date" @input="save()" 
@@ -186,20 +188,20 @@
                                                     </div>
                                                 </div>
 
-                                                <!-- Stepper Component (Diperbesar Touch Target-nya) -->
+                                                <!-- Stepper Component with Long-Press Support -->
                                                 <div x-show="!item.discontinued" class="flex items-center bg-slate-50/80 rounded-full border border-slate-200 p-1">
-                                                    <button @click="adjust(item.id, -1)" 
-                                                            class="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 active:scale-90"
+                                                    <button @click="adjust(item.id, -1)" @mousedown="startRepeat(item.id, -1)" @touchstart.prevent="startRepeat(item.id, -1)"
+                                                            class="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 active:scale-90 select-none"
                                                             :class="item.qty > 0 ? 'text-slate-700 bg-white shadow hover:bg-slate-50' : 'text-slate-300 pointer-events-none'">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/></svg>
                                                     </button>
-                                                    
-                                                    <span class="w-8 text-center font-bold text-sm" 
-                                                          :class="item.qty > 0 ? 'text-slate-900' : 'text-slate-400'" 
+
+                                                    <span class="w-8 text-center font-bold text-sm"
+                                                          :class="item.qty > 0 ? 'text-slate-900' : 'text-slate-400'"
                                                           x-text="item.qty"></span>
-                                                    
-                                                    <button @click="adjust(item.id, 1)" 
-                                                            class="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 active:scale-90 shadow-sm"
+
+                                                    <button @click="adjust(item.id, 1)" @mousedown="startRepeat(item.id, 1)" @touchstart.prevent="startRepeat(item.id, 1)"
+                                                            class="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 active:scale-90 shadow-sm select-none"
                                                             :class="item.qty > 0 ? 'bg-primary text-white hover:bg-primaryHover' : 'bg-white text-slate-700 hover:bg-slate-100'">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                                                     </button>
@@ -219,9 +221,16 @@
             <div x-show="currentTab === 'history'" x-transition.opacity.duration.300ms class="space-y-4">
                 <div class="flex items-center justify-between mb-2">
                     <h2 class="text-lg font-extrabold text-slate-900">Riwayat Pesanan</h2>
-                    <button @click="clearHistory()" x-show="history.length > 0" class="text-xs font-semibold text-slate-500 hover:text-red-600 transition-colors">
-                        Hapus Semua
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <button @click="historySelectMode = !historySelectMode; historySelected = {}"
+                                x-show="history.length > 0"
+                                x-text="historySelectMode ? 'Batal' : 'Pilih'"
+                                class="text-xs font-semibold text-slate-500 hover:text-slate-700 transition-colors">
+                        </button>
+                        <button @click="clearHistory()" x-show="history.length > 0 && !historySelectMode" class="text-xs font-semibold text-slate-500 hover:text-red-600 transition-colors">
+                            Hapus Semua
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Empty State -->
@@ -239,23 +248,38 @@
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
                         
                         <div class="flex justify-between items-start mb-3 pl-1">
-                            <div>
-                                <p class="font-bold text-sm text-slate-900" x-text="entry.storeName || 'Tanpa Nama Toko'"></p>
-                                <p class="text-[11px] text-slate-500" x-text="entry.dateFmt"></p>
+                            <div class="flex items-start gap-2">
+                                <button x-show="historySelectMode" @click.stop="historySelected[entry.id] = !historySelected[entry.id]"
+                                        class="mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all"
+                                        :class="historySelected[entry.id] ? 'bg-primary border-primary text-white' : 'border-slate-300'">
+                                    <svg x-show="historySelected[entry.id]" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </button>
+                                <div>
+                                    <p class="font-bold text-sm text-slate-900" x-text="entry.storeName || 'Tanpa Nama Toko'"></p>
+                                    <p class="text-[11px] text-slate-500" x-text="entry.dateFmt"></p>
+                                </div>
                             </div>
-                            <button @click="deleteHistoryEntry(entry.id)" class="text-slate-300 hover:text-red-500 bg-slate-50 hover:bg-red-50 p-1.5 rounded-lg transition-colors active:scale-90">
+                            <button @click="deleteHistoryEntry(entry.id)" x-show="!historySelectMode" class="text-slate-300 hover:text-red-500 bg-slate-50 hover:bg-red-50 p-1.5 rounded-lg transition-colors active:scale-90">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                             </button>
                         </div>
                         
-                        <div class="flex items-center justify-between text-sm mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100 ml-1">
-                            <span class="text-slate-600 text-xs font-semibold" x-text="`${entry.totalDus} Dus (${entry.totalPcs} pcs)`"></span>
-                            <span class="font-extrabold text-slate-900" x-text="formatRupiah(entry.totalPrice)"></span>
+                        <div class="flex items-center justify-between text-sm mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100 ml-1 cursor-pointer hover:bg-slate-100 active:scale-[0.98] transition-all"
+                             @click="showHistoryDetail = showHistoryDetail === entry.id ? null : entry.id">
+                            <div>
+                                <span class="text-slate-600 text-xs font-semibold" x-text="`${entry.totalDus} Dus • ${entry.items.length} Produk (${entry.totalPcs} pcs)`"></span>
+                                <span x-show="showHistoryDetail !== entry.id" class="text-[10px] text-slate-400 ml-1">— tap rincian</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-slate-900" x-text="formatRupiah(entry.totalPrice)"></span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                     class="text-slate-400 transition-transform duration-300"
+                                     :class="showHistoryDetail === entry.id ? 'rotate-180' : ''"><polyline points="6 9 12 15 18 9"/></svg>
+                            </div>
                         </div>
-                        
-                        <div class="flex gap-2 ml-1">
-                            <button @click="showHistoryDetail = entry.id" x-show="showHistoryDetail !== entry.id" class="flex-1 py-2.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-95 transition-all">Lihat Rincian</button>
-                            <button @click="copyText(entry.text)" class="flex-1 py-2.5 text-xs font-bold text-white bg-slate-800 rounded-xl hover:bg-slate-900 flex items-center justify-center gap-1.5 active:scale-95 transition-all">
+
+                        <div class="ml-1">
+                            <button @click="copyText(entry.text)" class="w-full py-2.5 text-xs font-bold text-white bg-slate-800 rounded-xl hover:bg-slate-900 flex items-center justify-center gap-1.5 active:scale-95 transition-all">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Salin Ulang
                             </button>
                         </div>
@@ -272,6 +296,15 @@
                         </div>
                     </div>
                 </template>
+
+                <!-- Bulk Delete Bar -->
+                <div x-show="historySelectMode && history.length > 0" class="mt-4" x-transition>
+                    <button @click="bulkDeleteHistory()"
+                            x-show="Object.values(historySelected).some(v => v)"
+                            class="w-full py-3 text-xs font-bold text-white bg-red-500 rounded-xl hover:bg-red-600 active:scale-95 transition-all">
+                        Hapus Terpilih (<span x-text="Object.values(historySelected).filter(v=>v).length"></span>)
+                    </button>
+                </div>
             </div>
         </main>
 
@@ -289,7 +322,7 @@
                  :class="totalDus >= 6 ? 'bg-slate-900 shadow-xl shadow-slate-900/20' : 'bg-slate-100 border border-slate-200'">
 
                 <div class="pl-3 py-1 flex-1">
-                    <p class="text-[10px] font-semibold tracking-wide" :class="totalDus >= 6 ? 'text-slate-400' : 'text-slate-500'">Estimasi (<span x-text="totalDus"></span> Dus)</p>
+                    <p class="text-[10px] font-semibold tracking-wide" :class="totalDus >= 6 ? 'text-slate-400' : 'text-slate-500'">Estimasi (<span x-text="totalDus"></span> Dus • <span x-text="totalJenisProduk"></span> Produk)</p>
                     <p class="font-extrabold text-[15px] leading-tight mt-0.5" :class="totalDus >= 6 ? 'text-white' : 'text-slate-500'" x-text="formatRupiah(totalPrice)"></p>
                 </div>
 
@@ -317,24 +350,25 @@
             </nav>
         </div>
 
-        <!-- Toast Notification (Modern Snackbar) -->
+        <!-- Toast Notification -->
         <div x-show="toast.show" x-transition.opacity.duration.300ms x-transition:enter-start="-translate-y-4" x-transition:enter-end="translate-y-0"
              class="fixed top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 bg-slate-800 text-white px-5 py-3 rounded-full shadow-2xl text-sm font-semibold whitespace-nowrap border border-slate-700">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             <span x-text="toast.message"></span>
+            <button x-show="toast.undo" @click="toast.undo(); toast.show = false" class="text-xs font-bold text-amber-400 hover:text-amber-300 bg-slate-700 px-2 py-0.5 rounded-full active:scale-95 transition-all shrink-0">Undo</button>
         </div>
 
         <!-- Modal Hasil Format -->
         <dialog id="result-modal" x-ref="modal" class="w-[90%] max-w-sm rounded-3xl shadow-2xl bg-white m-auto overflow-hidden">
             <div class="p-5 flex justify-between items-center bg-slate-50 border-b border-slate-100">
-                <h2 class="font-extrabold text-slate-900 text-base">Format Disalin</h2>
+                <h2 class="font-extrabold text-slate-900 text-base">Periksa Kembali</h2>
                 <button @click="$refs.modal.close()" class="text-slate-400 hover:text-slate-800 hover:bg-slate-200 bg-white p-2 rounded-full active:scale-90 transition-all border border-slate-200 shadow-sm">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
             
             <div class="p-5">
-                <p class="text-xs text-slate-500 mb-3 font-medium">Teks ini sudah otomatis tersalin. Silakan <strong class="text-slate-800">Paste</strong> di WhatsApp Anda.</p>
+                <p class="text-xs text-slate-500 mb-3 font-medium"><span class="text-amber-600 font-semibold">⚠️ Periksa kembali</span> nama toko, alamat, dan jumlah dus. Jika sudah sesuai, teks sudah tersalin — langsung <strong class="text-slate-800">Paste</strong> di WhatsApp.</p>
                 <!-- Area Struk Terminal -->
                 <div class="w-full h-64 bg-slate-800 rounded-2xl p-4 overflow-y-auto shadow-inner border border-slate-900">
                     <pre class="text-[12px] font-mono text-slate-300 whitespace-pre-wrap leading-relaxed" x-text="result"></pre>
@@ -476,10 +510,13 @@
                 result: '',
                 history: [],
                 showHistoryDetail: null,
-                toast: { show: false, message: '', timeout: null },
+                historySelectMode: false,
+                historySelected: {},
+                toast: { show: false, message: '', timeout: null, undo: null },
                 collapsedGroups: {},
                 showInstallPill: false,
                 deferredPrompt: null,
+                _repeatTimer: null,
 
                 init() {
                     // PWA install prompt — cek global event + listen untuk next fire
@@ -509,7 +546,15 @@
                             });
                         } catch(e) {}
                     }
-                    
+                    // Date selalu hari ini (override dari cache)
+                    this.store.date = new Date().toISOString().split('T')[0];
+
+                    // Restore fold state
+                    const foldCache = localStorage.getItem('hc_fold');
+                    if (foldCache) {
+                        try { this.collapsedGroups = JSON.parse(foldCache); } catch(e) {}
+                    }
+
                     const histCache = localStorage.getItem('hc_history');
                     if (histCache) {
                         try { this.history = JSON.parse(histCache); } catch(e) {}
@@ -517,11 +562,12 @@
                     this.$watch('currentTab', () => window.scrollTo({ top: 0, behavior: 'instant' }));
                 },
 
-                showToast(msg) {
+                showToast(msg, undoFn) {
                     this.toast.message = msg;
+                    this.toast.undo = undoFn || null;
                     this.toast.show = true;
                     if(this.toast.timeout) clearTimeout(this.toast.timeout);
-                    this.toast.timeout = setTimeout(() => this.toast.show = false, 2500);
+                    this.toast.timeout = setTimeout(() => this.toast.show = false, undoFn ? 5000 : 2500);
                 },
 
                 formatRupiah(num) {
@@ -557,16 +603,26 @@
                         this.collapsedGroups[price] = true;
                     }
                     this.collapsedGroups = { ...this.collapsedGroups };
+                    localStorage.setItem('hc_fold', JSON.stringify(this.collapsedGroups));
                 },
 
                 saveHistory() { localStorage.setItem('hc_history', JSON.stringify(this.history)); },
 
                 clear() {
-                    if(confirm('Hapus daftar produk di keranjang? (Nama dan Alamat toko aman)')) {
-                        this.items.forEach(i => i.qty = 0);
+                    const snapshot = this.items.map(i => i.qty);
+                    if (!snapshot.some(q => q > 0)) return;
+                    if (!confirm('Hapus daftar produk di keranjang? (Nama dan Alamat toko aman)')) return;
+
+                    this.items.forEach(i => i.qty = 0);
+                    this.save();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    // Undo toast
+                    const restore = () => {
+                        this.items.forEach((item, idx) => { item.qty = snapshot[idx] || 0; });
                         this.save();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
+                    };
+                    this.showToast('Pesanan direset.', restore);
                 },
 
                 adjust(id, val) {
@@ -577,9 +633,32 @@
                     this.save();
                 },
 
+                startRepeat(id, val) {
+                    this.adjust(id, val);
+                    this.stopRepeat();
+                    this._repeatTimer = setTimeout(() => {
+                        const fn = () => {
+                            const item = this.items.find(p => p.id === id);
+                            if (!item || (val < 0 && item.qty <= 0)) { this.stopRepeat(); return; }
+                            this.adjust(id, val);
+                        };
+                        this._repeatTimer = setInterval(fn, 80);
+                    }, 200);
+                    // Stop on any pointer release (global)
+                    const stop = () => { this.stopRepeat(); };
+                    window.addEventListener('mouseup', stop, { once: true });
+                    window.addEventListener('touchend', stop, { once: true });
+                },
+
+                stopRepeat() {
+                    if (this._repeatTimer) { clearInterval(this._repeatTimer); clearTimeout(this._repeatTimer); }
+                    this._repeatTimer = null;
+                },
+
                 get totalDus() { return this.items.reduce((a, b) => a + b.qty, 0); },
                 get totalPcs() { return this.items.reduce((a, b) => a + (b.qty * b.pcs), 0); },
                 get totalPrice() { return this.items.reduce((a, b) => a + (b.qty * b.pricePerDus), 0); },
+                get totalJenisProduk() { return this.items.filter(i => i.qty > 0).length; },
 
                 get productGroups() {
                     const map = this.items.reduce((acc, el) => {
@@ -624,7 +703,7 @@
                         num++;
                     });
 
-                    txt += `\n*TOTAL: ${this.totalDus} Dus*`;
+                    txt += `\n*TOTAL: ${this.totalDus} Dus (${this.totalJenisProduk} Produk)*`;
 
                     this.result = txt;
                     
@@ -654,6 +733,17 @@
                         this.history = this.history.filter(e => e.id !== id);
                         this.saveHistory();
                     }
+                },
+
+                bulkDeleteHistory() {
+                    const count = Object.values(this.historySelected).filter(v => v).length;
+                    if (!count) return;
+                    if (!confirm(`Hapus ${count} riwayat terpilih?`)) return;
+                    const ids = new Set(Object.keys(this.historySelected).filter(k => this.historySelected[k]).map(Number));
+                    this.history = this.history.filter(e => !ids.has(e.id));
+                    this.historySelected = {};
+                    this.historySelectMode = false;
+                    this.saveHistory();
                 },
 
                 clearHistory() {
